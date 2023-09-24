@@ -24,6 +24,9 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 
 @SuppressWarnings("serial")
@@ -263,8 +266,24 @@ public class ReservasView extends JFrame {
 		txtFechaSalida.setBackground(Color.WHITE);
 		txtFechaSalida.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtFechaSalida.addPropertyChangeListener(new PropertyChangeListener() {
+			
 			public void propertyChange(PropertyChangeEvent evt) {
-				//Activa el evento, después del usuario seleccionar las fechas se debe calcular el valor de la reserva
+			    Date entrada = txtFechaEntrada.getDate();
+			    Date salida = txtFechaSalida.getDate();
+
+			    if (entrada != null && salida != null) {
+			    	
+			    	long diferenciaMilisegundos = salida.getTime() - entrada.getTime();
+			    	
+			    	long total_days = TimeUnit.DAYS.convert(diferenciaMilisegundos, TimeUnit.MILLISECONDS);
+			    	
+			    	float factor = 100; 
+			    	
+			    	float valor = total_days * factor;
+
+			        // Actualiza el campo txtValor con el valor calculado
+			        txtValor.setText(String.format("%.2f", valor));
+			    }
 			}
 		});
 		txtFechaSalida.setDateFormatString("yyyy-MM-dd");
@@ -274,9 +293,9 @@ public class ReservasView extends JFrame {
 
 		txtValor = new JTextField();
 		txtValor.setBackground(SystemColor.text);
-		txtValor.setHorizontalAlignment(SwingConstants.CENTER);
+		txtValor.setHorizontalAlignment(SwingConstants.LEFT);
 		txtValor.setForeground(Color.BLACK);
-		txtValor.setBounds(78, 328, 43, 33);
+		txtValor.setBounds(78, 328, 262, 33);
 		txtValor.setEditable(false);
 		txtValor.setFont(new Font("Roboto Black", Font.BOLD, 17));
 		txtValor.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -289,7 +308,10 @@ public class ReservasView extends JFrame {
 		txtFormaPago.setBackground(SystemColor.text);
 		txtFormaPago.setBorder(new LineBorder(new Color(255, 255, 255), 1, true));
 		txtFormaPago.setFont(new Font("Roboto", Font.PLAIN, 16));
-		txtFormaPago.setModel(new DefaultComboBoxModel(new String[] {"Tarjeta de Crédito", "Tarjeta de Débito", "Dinero en efectivo"}));
+		txtFormaPago.setModel(new DefaultComboBoxModel(new String[] {
+				"Tarjeta de Crédito", 
+				"Tarjeta de Débito", 
+				"Dinero en efectivo"}));
 		panel.add(txtFormaPago);
 
 		JPanel btnsiguiente = new JPanel();
@@ -309,6 +331,8 @@ public class ReservasView extends JFrame {
 		btnsiguiente.setBounds(238, 493, 122, 35);
 		panel.add(btnsiguiente);
 		btnsiguiente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		btnsiguiente.add(lblSiguiente); // Add the label to the button
+		panel.add(btnsiguiente); // Add the button to the panel
 
 
 	}

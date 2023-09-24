@@ -17,6 +17,11 @@ import javax.swing.SwingConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class Login extends JFrame {
 
@@ -234,20 +239,58 @@ public class Login extends JFrame {
 		header.setLayout(null);
 	}
 	
+	/******************************************************************/
 	private void Login() {
-		 String Usuario= "admin";
-	     String Contraseña="admin";
+	    String inputUsuario = txtUsuario.getText();
+	    String inputContrasena = new String(txtContrasena.getPassword());
 
-	        String contrase=new String (txtContrasena.getPassword());
+	    // Realiza una consulta a la base de datos para verificar las credenciales
+	    boolean credencialesValidas = verificarCredenciales(inputUsuario, inputContrasena);
 
-	        if(txtUsuario.getText().equals(Usuario) && contrase.equals(Contraseña)){
-	            MenuUsuario menu = new MenuUsuario();
-	            menu.setVisible(true);
-	            dispose();	 
-	        }else {
-	            JOptionPane.showMessageDialog(this, "Usuario o Contraseña no válidos");
+	    if (credencialesValidas) {
+	        MenuUsuario menu = new MenuUsuario();
+	        menu.setVisible(true);
+	        dispose();
+	    } else {
+	        JOptionPane.showMessageDialog(this, "Usuario o Contraseña no válidos");
+	    }
+	}
+
+	private boolean verificarCredenciales(String usuario, String contrasena) {
+	    // URL de conexión a la base de datos MySQL
+	    String url = "jdbc:mysql://localhost:3306/bd_hotel";
+	    String usuarioBD = "root";
+	    String contrasenaBD = "";
+
+	    try {
+	        // Establecer la conexión con la base de datos
+	        Connection conexion = DriverManager.getConnection(url, usuarioBD, contrasenaBD);
+
+	        // Consulta SQL para verificar las credenciales
+	        String consultaSQL = "SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ?";
+	        PreparedStatement statement = conexion.prepareStatement(consultaSQL);
+	        statement.setString(1, usuario);
+	        statement.setString(2, contrasena);
+
+	        // Ejecutar la consulta
+	        ResultSet resultado = statement.executeQuery();
+
+	        // Si se encuentra un registro que coincide con las credenciales, retorna true
+	        if (resultado.next()) {
+	            conexion.close(); // Cierra la conexión a la base de datos
+	            return true;
 	        }
-	} 
+
+	        conexion.close(); // Cierra la conexión a la base de datos
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return false; // Si no se encontraron coincidencias, retorna false
+	}
+	/***********************************************************************************/
+	
+	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
 	        xMouse = evt.getX();
 	        yMouse = evt.getY();

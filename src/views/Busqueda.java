@@ -1,7 +1,9 @@
 package views;
 
+import views.ConexionMySql;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
@@ -25,6 +27,10 @@ import javax.swing.ListSelectionModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @SuppressWarnings("serial")
 public class Busqueda extends JFrame {
@@ -76,7 +82,6 @@ public class Busqueda extends JFrame {
 		contentPane.add(txtBuscar);
 		txtBuscar.setColumns(10);
 		
-		
 		JLabel lblNewLabel_4 = new JLabel("SISTEMA DE BÚSQUEDA");
 		lblNewLabel_4.setForeground(new Color(12, 138, 199));
 		lblNewLabel_4.setFont(new Font("Roboto Black", Font.BOLD, 24));
@@ -89,9 +94,6 @@ public class Busqueda extends JFrame {
 		panel.setBounds(20, 169, 865, 328);
 		contentPane.add(panel);
 
-		
-		
-		
 		tbReservas = new JTable();
 		tbReservas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		tbReservas.setFont(new Font("Roboto", Font.PLAIN, 16));
@@ -175,8 +177,8 @@ public class Busqueda extends JFrame {
 		labelAtras.setBounds(0, 0, 53, 36);
 		btnAtras.add(labelAtras);
 		
-		JPanel btnexit = new JPanel();
-		btnexit.addMouseListener(new MouseAdapter() {
+		JPanel btnExit = new JPanel();
+		btnExit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				MenuUsuario usuario = new MenuUsuario();
@@ -185,26 +187,26 @@ public class Busqueda extends JFrame {
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) { //Al usuario pasar el mouse por el botón este cambiará de color
-				btnexit.setBackground(Color.red);
+				btnExit.setBackground(Color.red);
 				labelExit.setForeground(Color.white);
 			}			
 			@Override
 			public void mouseExited(MouseEvent e) { //Al usuario quitar el mouse por el botón este volverá al estado original
-				 btnexit.setBackground(Color.white);
+				 btnExit.setBackground(Color.white);
 			     labelExit.setForeground(Color.black);
 			}
 		});
-		btnexit.setLayout(null);
-		btnexit.setBackground(Color.WHITE);
-		btnexit.setBounds(857, 0, 53, 36);
-		header.add(btnexit);
+		btnExit.setLayout(null);
+		btnExit.setBackground(Color.WHITE);
+		btnExit.setBounds(857, 0, 53, 36);
+		header.add(btnExit);
 		
 		labelExit = new JLabel("X");
 		labelExit.setHorizontalAlignment(SwingConstants.CENTER);
 		labelExit.setForeground(Color.BLACK);
 		labelExit.setFont(new Font("Roboto", Font.PLAIN, 18));
 		labelExit.setBounds(0, 0, 53, 36);
-		btnexit.add(labelExit);
+		btnExit.add(labelExit);
 		
 		JSeparator separator_1_2 = new JSeparator();
 		separator_1_2.setForeground(new Color(12, 138, 199));
@@ -212,22 +214,66 @@ public class Busqueda extends JFrame {
 		separator_1_2.setBounds(539, 159, 193, 2);
 		contentPane.add(separator_1_2);
 		
-		JPanel btnbuscar = new JPanel();
-		btnbuscar.addMouseListener(new MouseAdapter() {
+		JPanel btnBuscar = new JPanel();
+		
+		/************************************************************/
+		btnBuscar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+			    // Obtener el texto de búsqueda
+			    String textoBusqueda = txtBuscar.getText().trim();
 
+			    // Determinar la pestaña actual
+			    int pestañaActual = panel.getSelectedIndex();
+
+			    // Limpiar la tabla antes de agregar nuevos datos
+			    DefaultTableModel modelo = (DefaultTableModel) (pestañaActual == 0 ? tbReservas : tbHuespedes).getModel();
+			    modelo.setRowCount(0);
+
+			    // Realizar la consulta SQL correspondiente
+			    String consultaSQL = (pestañaActual == 0) ?
+			            "SELECT * FROM reserva WHERE id LIKE ?" :
+			            "SELECT * FROM huespedes WHERE Apellido LIKE ?";
+
+			    int resultadosEncontrados = 0; // Variable para rastrear el número de resultados encontrados
+
+			    try (Connection conexion = ConexionMySql.obtenerConexion();
+			         PreparedStatement consulta = conexion.prepareStatement(consultaSQL)) {
+			        consulta.setString(1, "%" + textoBusqueda + "%");
+			        ResultSet resultado = consulta.executeQuery();
+
+			        // Agregar los resultados de la consulta a la tabla
+			        while (resultado.next()) {
+			            Object[] fila = new Object[modelo.getColumnCount()];
+			            for (int i = 1; i <= modelo.getColumnCount(); i++) {
+			                fila[i - 1] = resultado.getObject(i);
+			            }
+			            modelo.addRow(fila);
+			            resultadosEncontrados++; // Incrementar el contador de resultados encontrados
+			        }
+			        
+			    } catch (SQLException ex) {
+			        ex.printStackTrace();
+			    }
+
+			    // Mostrar un mensaje si no se encontraron resultados
+			    if (resultadosEncontrados == 0) {
+			        // Aquí puedes mostrar un JOptionPane, JLabel u otro componente para mostrar el mensaje de aviso
+			        // Por ejemplo, puedes usar JOptionPane.showMessageDialog o configurar un JLabel en la interfaz
+			        JOptionPane.showMessageDialog(null, "No se encontraron resultados.");
+			    }
 			}
-		});
-		btnbuscar.setLayout(null);
-		btnbuscar.setBackground(new Color(12, 138, 199));
-		btnbuscar.setBounds(748, 125, 122, 35);
-		btnbuscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-		contentPane.add(btnbuscar);
+        });
+		/************************************************************/
+		btnBuscar.setLayout(null);
+		btnBuscar.setBackground(new Color(12, 138, 199));
+		btnBuscar.setBounds(748, 125, 122, 35);
+		btnBuscar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		contentPane.add(btnBuscar);
 		
 		JLabel lblBuscar = new JLabel("BUSCAR");
 		lblBuscar.setBounds(0, 0, 122, 35);
-		btnbuscar.add(lblBuscar);
+		btnBuscar.add(lblBuscar);
 		lblBuscar.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBuscar.setForeground(Color.WHITE);
 		lblBuscar.setFont(new Font("Roboto", Font.PLAIN, 18));

@@ -27,6 +27,7 @@ import javax.swing.border.LineBorder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import views.RegistroHuesped;
 
 
 @SuppressWarnings("serial")
@@ -75,8 +76,6 @@ public class ReservasView extends JFrame {
 		setLocationRelativeTo(null);
 		setUndecorated(true);
 		
-
-		
 		JPanel panel = new JPanel();
 		panel.setBorder(null);
 		panel.setBackground(Color.WHITE);
@@ -85,7 +84,6 @@ public class ReservasView extends JFrame {
 		panel.setLayout(null);
 		
 		// Código que crea los elementos de la interfáz gráfica
-		
 		JSeparator separator_1_2 = new JSeparator();
 		separator_1_2.setForeground(SystemColor.textHighlight);
 		separator_1_2.setBounds(68, 195, 289, 2);
@@ -266,21 +264,15 @@ public class ReservasView extends JFrame {
 		txtFechaSalida.setBackground(Color.WHITE);
 		txtFechaSalida.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtFechaSalida.addPropertyChangeListener(new PropertyChangeListener() {
-			
 			public void propertyChange(PropertyChangeEvent evt) {
 			    Date entrada = txtFechaEntrada.getDate();
 			    Date salida = txtFechaSalida.getDate();
-
+			    
 			    if (entrada != null && salida != null) {
-			    	
 			    	long diferenciaMilisegundos = salida.getTime() - entrada.getTime();
-			    	
 			    	long total_days = TimeUnit.DAYS.convert(diferenciaMilisegundos, TimeUnit.MILLISECONDS);
-			    	
 			    	float factor = 100; 
-			    	
 			    	float valor = total_days * factor;
-
 			        // Actualiza el campo txtValor con el valor calculado
 			        txtValor.setText(String.format("%.2f", valor));
 			    }
@@ -302,7 +294,6 @@ public class ReservasView extends JFrame {
 		panel.add(txtValor);
 		txtValor.setColumns(10);
 
-
 		txtFormaPago = new JComboBox();
 		txtFormaPago.setBounds(68, 417, 289, 38);
 		txtFormaPago.setBackground(SystemColor.text);
@@ -316,16 +307,24 @@ public class ReservasView extends JFrame {
 
 		JPanel btnsiguiente = new JPanel();
 		btnsiguiente.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null) {		
-					RegistroHuesped registro = new RegistroHuesped();
-					registro.setVisible(true);
-				} else {
-					JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
-				}
-			}						
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null){
+		            // Obtener los valores de las variables
+		            Date fechaEntrada = ReservasView.txtFechaEntrada.getDate();
+		            Date fechaSalida = ReservasView.txtFechaSalida.getDate();
+		            float valorReserva = Float.parseFloat(ReservasView.txtValor.getText());
+		            String formaPago = (String) ReservasView.txtFormaPago.getSelectedItem();
+		            
+		            // Crear una instancia de RegistroHuesped y pasar los valores
+		            RegistroHuesped registro = new RegistroHuesped(fechaEntrada, fechaSalida, valorReserva, formaPago);
+		            registro.setVisible(true);
+		        } else {
+		            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
+		        }
+		    }
 		});
+		
 		btnsiguiente.setLayout(null);
 		btnsiguiente.setBackground(SystemColor.textHighlight);
 		btnsiguiente.setBounds(238, 493, 122, 35);
@@ -333,8 +332,6 @@ public class ReservasView extends JFrame {
 		btnsiguiente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		btnsiguiente.add(lblSiguiente); // Add the label to the button
 		panel.add(btnsiguiente); // Add the button to the panel
-
-
 	}
 		
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	
@@ -347,5 +344,4 @@ public class ReservasView extends JFrame {
 	        int x = evt.getXOnScreen();
 	        int y = evt.getYOnScreen();
 	        this.setLocation(x - xMouse, y - yMouse);
-}
-}
+}}

@@ -7,6 +7,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -16,6 +18,7 @@ import java.awt.Color;
 import java.awt.SystemColor;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.event.ActionEvent;
@@ -32,7 +35,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@SuppressWarnings("serial")
+@SuppressWarnings({ "serial", "unused" })
 public class Busqueda extends JFrame {
 
 	private JPanel contentPane;
@@ -43,6 +46,7 @@ public class Busqueda extends JFrame {
 	private DefaultTableModel modeloHuesped;
 	private JLabel labelAtras;
 	private JLabel labelExit;
+	private int pestañaActual;
 	int xMouse, yMouse;
 
 	/**
@@ -177,6 +181,20 @@ public class Busqueda extends JFrame {
 		labelAtras.setBounds(0, 0, 53, 36);
 		btnAtras.add(labelAtras);
 		
+		/*********************************************************/
+		
+		//Guardan el indice de la pestania selecionada
+		
+		panel.addChangeListener(new ChangeListener() {
+		    @Override
+		    public void stateChanged(ChangeEvent e) {
+		        pestañaActual = panel.getSelectedIndex();
+		    }
+		});
+
+		/********************************************************/
+		
+		
 		JPanel btnExit = new JPanel();
 		btnExit.addMouseListener(new MouseAdapter() {
 			@Override
@@ -220,6 +238,7 @@ public class Busqueda extends JFrame {
 		btnBuscar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+					
 			    // Obtener el texto de búsqueda
 			    String textoBusqueda = txtBuscar.getText().trim();
 
@@ -279,11 +298,46 @@ public class Busqueda extends JFrame {
 		lblBuscar.setFont(new Font("Roboto", Font.PLAIN, 18));
 		
 		JPanel btnEditar = new JPanel();
+		
+		btnEditar.addMouseListener(new MouseAdapter() {
+	
+			public void mouseClicked(MouseEvent e) {
+
+				int filaSeleccionada = (pestañaActual == 0) ? tbReservas.getSelectedRow() : tbHuespedes.getSelectedRow();
+
+		        if (filaSeleccionada == -1) {
+		            // Asegúrate de que se haya seleccionado una fila
+		            JOptionPane.showMessageDialog(null, "Selecciona una fila para editar.", "Error", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+
+		        String numeroReserva = (pestañaActual == 0) ?
+		                tbReservas.getValueAt(filaSeleccionada, 0).toString() :
+		                tbHuespedes.getValueAt(filaSeleccionada, 0).toString();
+
+		        if (pestañaActual == 0) {
+		            editarReservas(numeroReserva);
+		        } else {
+		            editarHuespedes(numeroReserva);
+		        }
+		    }
+
+			private void editarHuespedes(String numeroReserva) {
+				System.out.println("Huespedes");
+				
+			}
+
+			private void editarReservas(String numeroReserva) {
+				System.out.println("Reservas");
+			}
+		});	
+		
 		btnEditar.setLayout(null);
 		btnEditar.setBackground(new Color(12, 138, 199));
 		btnEditar.setBounds(635, 508, 122, 35);
 		btnEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		contentPane.add(btnEditar);
+	
 		
 		JLabel lblEditar = new JLabel("EDITAR");
 		lblEditar.setHorizontalAlignment(SwingConstants.CENTER);

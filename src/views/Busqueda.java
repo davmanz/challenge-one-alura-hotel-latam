@@ -316,20 +316,138 @@ public class Busqueda extends JFrame {
 		                tbHuespedes.getValueAt(filaSeleccionada, 0).toString();
 
 		        if (pestañaActual == 0) {
-		            editarReservas(numeroReserva);
+		            editarReserva(numeroReserva);
 		        } else {
 		            editarHuespedes(numeroReserva);
 		        }
 		    }
 
 			private void editarHuespedes(String numeroReserva) {
-				System.out.println("Huespedes");
-				
+			    String consultaSQL = "SELECT * FROM huespedes WHERE idReserva = ?";
+			    try (Connection conexion = ConexionMySql.obtenerConexion();
+			         PreparedStatement consulta = conexion.prepareStatement(consultaSQL)) {
+			        consulta.setString(1, numeroReserva);
+			        ResultSet resultado = consulta.executeQuery();
+			
+			        if (resultado.next()) {
+			            JFrame ventanaEdicion = new JFrame("Editar Huésped");
+			            ventanaEdicion.setSize(400, 300);
+			
+			            JTextField txtNombre = new JTextField(resultado.getString("Nombre"));
+			            JTextField txtApellido = new JTextField(resultado.getString("Apellido"));
+			            JTextField txtNacimiento = new JTextField(resultado.getString("FechaNacimiento"));
+			            JTextField txtNacionalidad = new JTextField(resultado.getString("Nacionalidad"));
+			            JTextField txtTelefono = new JTextField(resultado.getString("Telefono"));
+			            JTextField txtIdReserva = new JTextField(resultado.getString("idReserva"));
+			
+			            JButton btnGuardar = new JButton("Guardar Cambios");
+			            btnGuardar.addActionListener(new ActionListener() {
+			                @Override
+			                public void actionPerformed(ActionEvent e) {
+			                    try (Connection conexionActualizacion = ConexionMySql.obtenerConexion();
+			                         PreparedStatement actualizacion = conexionActualizacion.prepareStatement(
+			                             "UPDATE huespedes SET Nombre = ?, Apellido = ?, FechaNacimiento = ?, Nacionalidad = ?, Telefono = ?, idReserva = ? WHERE idReserva = ?")) {
+			                        actualizacion.setString(1, txtNombre.getText());
+			                        actualizacion.setString(2, txtApellido.getText());
+			                        actualizacion.setString(3, txtNacimiento.getText());
+			                        actualizacion.setString(4, txtNacionalidad.getText());
+			                        actualizacion.setString(5, txtTelefono.getText());
+			                        actualizacion.setString(6, txtIdReserva.getText());
+			                        actualizacion.setString(7, numeroReserva);
+			
+			                        actualizacion.executeUpdate();
+			
+			                        JOptionPane.showMessageDialog(null, "Los cambios se han guardado correctamente.");
+			                        ventanaEdicion.dispose();
+			                    } catch (SQLException ex) {
+			                        ex.printStackTrace();
+			                        JOptionPane.showMessageDialog(null, "Error al guardar los cambios.");
+			                    }
+			                }
+			            });
+			
+			            ventanaEdicion.setLayout(new GridLayout(7, 2));
+			            ventanaEdicion.add(new JLabel("Nombre:"));
+			            ventanaEdicion.add(txtNombre);
+			            ventanaEdicion.add(new JLabel("Apellido:"));
+			            ventanaEdicion.add(txtApellido);
+			            ventanaEdicion.add(new JLabel("Fecha de Nacimiento:"));
+			            ventanaEdicion.add(txtNacimiento);
+			            ventanaEdicion.add(new JLabel("Nacionalidad:"));
+			            ventanaEdicion.add(txtNacionalidad);
+			            ventanaEdicion.add(new JLabel("Teléfono:"));
+			            ventanaEdicion.add(txtTelefono);
+			            ventanaEdicion.add(new JLabel("ID de Reserva:"));
+			            ventanaEdicion.add(txtIdReserva);
+			            ventanaEdicion.add(btnGuardar);
+			
+			            ventanaEdicion.setVisible(true);
+			        }
+			    } catch (SQLException ex) {
+			        ex.printStackTrace();
+			        JOptionPane.showMessageDialog(null, "Error al obtener los datos del huésped.");
+			    }
 			}
 
-			private void editarReservas(String numeroReserva) {
-				System.out.println("Reservas");
+			private void editarReserva(String numeroReserva) {
+				
+			    String consultaSQL = "SELECT * FROM reserva WHERE id = ?";
+			    try (Connection conexion = ConexionMySql.obtenerConexion();
+			         PreparedStatement consulta = conexion.prepareStatement(consultaSQL)) {
+			        consulta.setString(1, numeroReserva);
+			        ResultSet resultado = consulta.executeQuery();
+			
+			        if (resultado.next()) {
+			            JFrame ventanaEdicion = new JFrame("Editar Reserva");
+			            ventanaEdicion.setSize(400, 300);
+			
+			            JTextField txtFechaEntrada = new JTextField(resultado.getString("FechaEntrada"));
+			            JTextField txtFechaSalida = new JTextField(resultado.getString("FechaSalida"));
+			            JTextField txtValor = new JTextField(resultado.getString("Valor"));
+			            JTextField txtFormaPago = new JTextField(resultado.getString("FormaPago"));
+			
+			            JButton btnGuardar = new JButton("Guardar Cambios");
+			            btnGuardar.addActionListener(new ActionListener() {
+			                @Override
+			                public void actionPerformed(ActionEvent e) {
+			                    try (Connection conexionActualizacion = ConexionMySql.obtenerConexion();
+			                         PreparedStatement actualizacion = conexionActualizacion.prepareStatement(
+			                             "UPDATE reserva SET FechaEntrada = ?, FechaSalida = ?, Valor = ?, FormaPago = ? WHERE id = ?")) {
+			                        actualizacion.setString(1, txtFechaEntrada.getText());
+			                        actualizacion.setString(2, txtFechaSalida.getText());
+			                        actualizacion.setString(3, txtValor.getText());
+			                        actualizacion.setString(4, txtFormaPago.getText());
+			                        actualizacion.setString(5, numeroReserva);
+			                        actualizacion.executeUpdate();
+			
+			                        JOptionPane.showMessageDialog(null, "Los cambios se han guardado correctamente.");
+			                        ventanaEdicion.dispose();
+			                    } catch (SQLException ex) {
+			                        ex.printStackTrace();
+			                        JOptionPane.showMessageDialog(null, "Error al guardar los cambios.");
+			                    }
+			                }
+			            });
+			
+			            ventanaEdicion.setLayout(new GridLayout(5, 2));
+			            ventanaEdicion.add(new JLabel("Fecha de Entrada:"));
+			            ventanaEdicion.add(txtFechaEntrada);
+			            ventanaEdicion.add(new JLabel("Fecha de Salida:"));
+			            ventanaEdicion.add(txtFechaSalida);
+			            ventanaEdicion.add(new JLabel("Valor:"));
+			            ventanaEdicion.add(txtValor);
+			            ventanaEdicion.add(new JLabel("Forma de Pago:"));
+			            ventanaEdicion.add(txtFormaPago);
+			            ventanaEdicion.add(btnGuardar);
+			
+			            ventanaEdicion.setVisible(true);
+			        }
+			    } catch (SQLException ex) {
+			        ex.printStackTrace();
+			        JOptionPane.showMessageDialog(null, "Error al obtener los datos de la reserva.");
+			    }
 			}
+
 		});	
 		
 		btnEditar.setLayout(null);
@@ -347,6 +465,92 @@ public class Busqueda extends JFrame {
 		btnEditar.add(lblEditar);
 		
 		JPanel btnEliminar = new JPanel();
+
+		btnEliminar.addMouseListener(new MouseAdapter() {
+		    public void mouseClicked(MouseEvent e) {
+		        int filaSeleccionada = (pestañaActual == 0) ? tbReservas.getSelectedRow() : tbHuespedes.getSelectedRow();
+
+		        if (filaSeleccionada == -1) {
+		            // Asegúrate de que se haya seleccionado una fila
+		            JOptionPane.showMessageDialog(null, "Selecciona una fila para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+
+		        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quieres eliminar este registro?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
+
+		        if (confirmacion == JOptionPane.YES_OPTION) {
+		            if (pestañaActual == 0) {
+		                borrarReserva(filaSeleccionada);
+		            } else {
+		                borrarHuesped(filaSeleccionada);
+		            }
+		        }
+		    }
+
+		    // Función para borrar una reserva y su huésped asociado
+		    private void borrarReserva(int filaSeleccionada) {
+		        String numeroReserva = tbReservas.getValueAt(filaSeleccionada, 0).toString();
+		        
+		        // Realizar la eliminación en la base de datos
+		        try (Connection conexion = ConexionMySql.obtenerConexion();
+		             PreparedStatement eliminacionReserva = conexion.prepareStatement("DELETE FROM reserva WHERE id = ?");
+		             PreparedStatement eliminacionHuesped = conexion.prepareStatement("DELETE FROM huespedes WHERE idReserva = ?")) {
+		            eliminacionReserva.setString(1, numeroReserva);
+		            eliminacionHuesped.setString(1, numeroReserva);
+
+		            int filasReserva = eliminacionReserva.executeUpdate();
+		            int filasHuesped = eliminacionHuesped.executeUpdate();
+		         
+
+		            if (filasReserva > 0 && filasHuesped > 0) {
+		                JOptionPane.showMessageDialog(null, "El registro de reserva y su huésped se han eliminado correctamente.");
+		                // Actualiza la tabla para reflejar los cambios
+		                modelo.removeRow(filaSeleccionada);
+		                modeloHuesped.removeRow(filaSeleccionada);
+		            } else {
+		                JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro de reserva y su huésped.", "Error", JOptionPane.ERROR_MESSAGE);
+		            }
+		        } catch (SQLException ex) {
+		            ex.printStackTrace();
+		            JOptionPane.showMessageDialog(null, "Error al eliminar el registro de reserva y su huésped.", "Error", JOptionPane.ERROR_MESSAGE);
+		        }
+		    }
+
+		    // Función para borrar un huésped y su reserva asociada
+		    private void borrarHuesped(int filaSeleccionada) {
+		        String numeroHuesped = tbHuespedes.getValueAt(filaSeleccionada, 0).toString();
+		        
+		        System.out.println(numeroHuesped);
+		        
+		        // Realizar la eliminación en la base de datos
+		        try (Connection conexion = ConexionMySql.obtenerConexion();
+		        		
+		             PreparedStatement eliminacionHuesped = conexion.prepareStatement("DELETE FROM huespedes WHERE id = ?");
+		             PreparedStatement eliminacionReserva = conexion.prepareStatement("DELETE FROM reserva WHERE id = (SELECT idReserva FROM huespedes WHERE id = ?)")){
+		            
+		        	eliminacionHuesped.setString(1, numeroHuesped);
+		            eliminacionReserva.setString(1, numeroHuesped);
+		            
+		            int filasReserva = eliminacionReserva.executeUpdate();
+		            int filasHuesped = eliminacionHuesped.executeUpdate();
+		            
+		            if (filasHuesped > 0 && filasReserva > 0) {
+		                JOptionPane.showMessageDialog(null, "El registro de huésped y su reserva se han eliminado correctamente.");
+		                
+		                // Actualiza la tabla para reflejar los cambios
+		                modelo.removeRow(filaSeleccionada);
+		                modeloHuesped.removeRow(filaSeleccionada);
+		            } else {
+		                JOptionPane.showMessageDialog(null, "No se pudo eliminar el registro de huésped y su reserva.", "Error", JOptionPane.ERROR_MESSAGE);
+		            }
+		        } catch (SQLException ex) {
+		            ex.printStackTrace();
+		            JOptionPane.showMessageDialog(null, "Error al eliminar el registro de huésped y su reserva.", "Error", JOptionPane.ERROR_MESSAGE);
+		        }
+		    }
+
+		});
+		
 		btnEliminar.setLayout(null);
 		btnEliminar.setBackground(new Color(12, 138, 199));
 		btnEliminar.setBounds(767, 508, 122, 35);

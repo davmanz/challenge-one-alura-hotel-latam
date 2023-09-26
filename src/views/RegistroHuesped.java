@@ -299,13 +299,9 @@ public class RegistroHuesped extends JFrame {
 			                JOptionPane.WARNING_MESSAGE);
 			    } else {
 			        try {
-			            // Configura la conexión a la base de datos (reemplaza con tus propios valores)
-			            String url = "jdbc:mysql://localhost:3306/bd_hotel";
-			            String usuario = "root";
-			            String contraseña = "";
-
+			            
 			            // Establece la conexión
-			            Connection conexion = DriverManager.getConnection(url, usuario, contraseña);
+			            Connection conexion = ConexionMySql.obtenerConexion();
 
 			            // Consulta para obtener el último ID de reserva
 			            String consultaUltimoID = "SELECT MAX(idReserva) FROM huespedes";
@@ -317,8 +313,8 @@ public class RegistroHuesped extends JFrame {
 			                ultimoID = rs.getInt(1);
 			            }
 
-			            // Genera el nuevo ID de reserva sumando 1 al último ID
-			            int nuevoID = ultimoID + 1;
+			            // Si el último ID es 0 (no hay registros), establece nuevoID en 1; de lo contrario, suma 1 al último ID
+			            int nuevoID = (ultimoID == 0) ? 1 : ultimoID + 1;
 
 			            // Genera el número de reserva con el formato "ALR-fecha actual-número generado"
 			            

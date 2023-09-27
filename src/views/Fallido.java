@@ -19,14 +19,16 @@ import java.awt.Window.Type;
 
 @SuppressWarnings("serial")
 public class Fallido extends JDialog {
+	
+	private static RegistroHuesped hr;
 
 	private final JPanel contentPanel = new JPanel();
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(RegistroHuesped[] args) {
 		try {
-			Exito dialog = new Exito();
+			Exito dialog = new Exito(hr);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -36,7 +38,7 @@ public class Fallido extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public Fallido() {
+	public Fallido(RegistroHuesped hr) {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Exito.class.getResource("/imagenes/aH-40px.png")));
 		setBounds(100, 100, 394, 226);
 		getContentPane().setLayout(new BorderLayout());
@@ -67,6 +69,8 @@ public class Fallido extends JDialog {
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
+				hr.dispose();
+				dispose();
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");

@@ -18,7 +18,10 @@ import java.awt.Color;
 import java.awt.SystemColor;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.awt.event.ActionEvent;
@@ -46,7 +49,7 @@ public class Busqueda extends JFrame {
 	private DefaultTableModel modeloHuesped;
 	private JLabel labelAtras;
 	private JLabel labelExit;
-	private int pestañaActual;
+	private int indicePestaña;
 	int xMouse, yMouse;
 
 	/**
@@ -88,7 +91,7 @@ public class Busqueda extends JFrame {
 		
 		JLabel lblNewLabel_4 = new JLabel("SISTEMA DE BÚSQUEDA");
 		lblNewLabel_4.setForeground(new Color(12, 138, 199));
-		lblNewLabel_4.setFont(new Font("Roboto Black", Font.BOLD, 24));
+		lblNewLabel_4.setFont(new Font("Dialog", Font.BOLD, 22));
 		lblNewLabel_4.setBounds(331, 62, 280, 42);
 		contentPane.add(lblNewLabel_4);
 		
@@ -188,13 +191,13 @@ public class Busqueda extends JFrame {
 		panel.addChangeListener(new ChangeListener() {
 		    @Override
 		    public void stateChanged(ChangeEvent e) {
-		        pestañaActual = panel.getSelectedIndex();
+		        indicePestaña = panel.getSelectedIndex();
+		        txtBuscar.setText("");
 		    }
 		});
 
 		/********************************************************/
-		
-		
+				
 		JPanel btnExit = new JPanel();
 		btnExit.addMouseListener(new MouseAdapter() {
 			@Override
@@ -243,7 +246,7 @@ public class Busqueda extends JFrame {
 			    String textoBusqueda = txtBuscar.getText().trim();
 
 			    // Determinar la pestaña actual
-			    int pestañaActual = panel.getSelectedIndex();
+			    int pestañaActual = indicePestaña;
 
 			    // Limpiar la tabla antes de agregar nuevos datos
 			    DefaultTableModel modelo = (DefaultTableModel) (pestañaActual == 0 ? tbReservas : tbHuespedes).getModel();
@@ -303,7 +306,7 @@ public class Busqueda extends JFrame {
 	
 			public void mouseClicked(MouseEvent e) {
 
-				int filaSeleccionada = (pestañaActual == 0) ? tbReservas.getSelectedRow() : tbHuespedes.getSelectedRow();
+				int filaSeleccionada = (indicePestaña == 0) ? tbReservas.getSelectedRow() : tbHuespedes.getSelectedRow();
 
 		        if (filaSeleccionada == -1) {
 		            // Asegúrate de que se haya seleccionado una fila
@@ -311,11 +314,11 @@ public class Busqueda extends JFrame {
 		            return;
 		        }
 
-		        String numeroReserva = (pestañaActual == 0) ?
+		        String numeroReserva = (indicePestaña == 0) ?
 		                tbReservas.getValueAt(filaSeleccionada, 0).toString() :
-		                tbHuespedes.getValueAt(filaSeleccionada, 0).toString();
+		                tbHuespedes.getValueAt(filaSeleccionada, 6).toString();
 
-		        if (pestañaActual == 0) {
+		        if (indicePestaña == 0) {
 		            editarReserva(numeroReserva);
 		        } else {
 		            editarHuespedes(numeroReserva);
@@ -328,18 +331,23 @@ public class Busqueda extends JFrame {
 			         PreparedStatement consulta = conexion.prepareStatement(consultaSQL)) {
 			        consulta.setString(1, numeroReserva);
 			        ResultSet resultado = consulta.executeQuery();
-			
+
 			        if (resultado.next()) {
 			            JFrame ventanaEdicion = new JFrame("Editar Huésped");
 			            ventanaEdicion.setSize(400, 300);
-			
+
+			            JPanel panel = new JPanel(new GridBagLayout());
+			            GridBagConstraints gbc = new GridBagConstraints();
+			            gbc.insets = new Insets(5, 5, 5, 5);
+
 			            JTextField txtNombre = new JTextField(resultado.getString("Nombre"));
 			            JTextField txtApellido = new JTextField(resultado.getString("Apellido"));
 			            JTextField txtNacimiento = new JTextField(resultado.getString("FechaNacimiento"));
 			            JTextField txtNacionalidad = new JTextField(resultado.getString("Nacionalidad"));
 			            JTextField txtTelefono = new JTextField(resultado.getString("Telefono"));
 			            JTextField txtIdReserva = new JTextField(resultado.getString("idReserva"));
-			
+			            txtIdReserva.setEnabled(false);
+
 			            JButton btnGuardar = new JButton("Guardar Cambios");
 			            btnGuardar.addActionListener(new ActionListener() {
 			                @Override
@@ -354,9 +362,9 @@ public class Busqueda extends JFrame {
 			                        actualizacion.setString(5, txtTelefono.getText());
 			                        actualizacion.setString(6, txtIdReserva.getText());
 			                        actualizacion.setString(7, numeroReserva);
-			
+
 			                        actualizacion.executeUpdate();
-			
+
 			                        JOptionPane.showMessageDialog(null, "Los cambios se han guardado correctamente.");
 			                        ventanaEdicion.dispose();
 			                    } catch (SQLException ex) {
@@ -365,22 +373,59 @@ public class Busqueda extends JFrame {
 			                    }
 			                }
 			            });
-			
-			            ventanaEdicion.setLayout(new GridLayout(7, 2));
-			            ventanaEdicion.add(new JLabel("Nombre:"));
-			            ventanaEdicion.add(txtNombre);
-			            ventanaEdicion.add(new JLabel("Apellido:"));
-			            ventanaEdicion.add(txtApellido);
-			            ventanaEdicion.add(new JLabel("Fecha de Nacimiento:"));
-			            ventanaEdicion.add(txtNacimiento);
-			            ventanaEdicion.add(new JLabel("Nacionalidad:"));
-			            ventanaEdicion.add(txtNacionalidad);
-			            ventanaEdicion.add(new JLabel("Teléfono:"));
-			            ventanaEdicion.add(txtTelefono);
-			            ventanaEdicion.add(new JLabel("ID de Reserva:"));
-			            ventanaEdicion.add(txtIdReserva);
-			            ventanaEdicion.add(btnGuardar);
-			
+
+			            // Configura GridBagConstraints para centrar componentes
+			            gbc.anchor = GridBagConstraints.WEST;
+			            gbc.fill = GridBagConstraints.HORIZONTAL;
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 0;
+			            panel.add(new JLabel("Nombre:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtNombre, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 1;
+			            panel.add(new JLabel("Apellido:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtApellido, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 2;
+			            panel.add(new JLabel("Fecha de Nacimiento:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtNacimiento, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 3;
+			            panel.add(new JLabel("Nacionalidad:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtNacionalidad, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 4;
+			            panel.add(new JLabel("Teléfono:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtTelefono, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 5;
+			            panel.add(new JLabel("ID de Reserva:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtIdReserva, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 6;
+			            gbc.gridwidth = 2;
+			            panel.add(btnGuardar, gbc);
+
+			            ventanaEdicion.getContentPane().add(panel);
 			            ventanaEdicion.setVisible(true);
 			        }
 			    } catch (SQLException ex) {
@@ -389,23 +434,27 @@ public class Busqueda extends JFrame {
 			    }
 			}
 
+
 			private void editarReserva(String numeroReserva) {
-				
 			    String consultaSQL = "SELECT * FROM reserva WHERE id = ?";
 			    try (Connection conexion = ConexionMySql.obtenerConexion();
 			         PreparedStatement consulta = conexion.prepareStatement(consultaSQL)) {
 			        consulta.setString(1, numeroReserva);
 			        ResultSet resultado = consulta.executeQuery();
-			
+
 			        if (resultado.next()) {
 			            JFrame ventanaEdicion = new JFrame("Editar Reserva");
 			            ventanaEdicion.setSize(400, 300);
-			
+
+			            JPanel panel = new JPanel(new GridBagLayout());
+			            GridBagConstraints gbc = new GridBagConstraints();
+			            gbc.insets = new Insets(5, 5, 5, 5);
+
 			            JTextField txtFechaEntrada = new JTextField(resultado.getString("FechaEntrada"));
 			            JTextField txtFechaSalida = new JTextField(resultado.getString("FechaSalida"));
 			            JTextField txtValor = new JTextField(resultado.getString("Valor"));
 			            JTextField txtFormaPago = new JTextField(resultado.getString("FormaPago"));
-			
+
 			            JButton btnGuardar = new JButton("Guardar Cambios");
 			            btnGuardar.addActionListener(new ActionListener() {
 			                @Override
@@ -419,7 +468,7 @@ public class Busqueda extends JFrame {
 			                        actualizacion.setString(4, txtFormaPago.getText());
 			                        actualizacion.setString(5, numeroReserva);
 			                        actualizacion.executeUpdate();
-			
+
 			                        JOptionPane.showMessageDialog(null, "Los cambios se han guardado correctamente.");
 			                        ventanaEdicion.dispose();
 			                    } catch (SQLException ex) {
@@ -428,18 +477,45 @@ public class Busqueda extends JFrame {
 			                    }
 			                }
 			            });
-			
-			            ventanaEdicion.setLayout(new GridLayout(5, 2));
-			            ventanaEdicion.add(new JLabel("Fecha de Entrada:"));
-			            ventanaEdicion.add(txtFechaEntrada);
-			            ventanaEdicion.add(new JLabel("Fecha de Salida:"));
-			            ventanaEdicion.add(txtFechaSalida);
-			            ventanaEdicion.add(new JLabel("Valor:"));
-			            ventanaEdicion.add(txtValor);
-			            ventanaEdicion.add(new JLabel("Forma de Pago:"));
-			            ventanaEdicion.add(txtFormaPago);
-			            ventanaEdicion.add(btnGuardar);
-			
+
+			            // Configura GridBagConstraints para centrar componentes
+			            gbc.anchor = GridBagConstraints.WEST;
+			            gbc.fill = GridBagConstraints.HORIZONTAL;
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 0;
+			            panel.add(new JLabel("Fecha de Entrada:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtFechaEntrada, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 1;
+			            panel.add(new JLabel("Fecha de Salida:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtFechaSalida, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 2;
+			            panel.add(new JLabel("Valor:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtValor, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 3;
+			            panel.add(new JLabel("Forma de Pago:"), gbc);
+
+			            gbc.gridx = 1;
+			            panel.add(txtFormaPago, gbc);
+
+			            gbc.gridx = 0;
+			            gbc.gridy = 4;
+			            gbc.gridwidth = 2;
+			            panel.add(btnGuardar, gbc);
+
+			            ventanaEdicion.getContentPane().add(panel);
 			            ventanaEdicion.setVisible(true);
 			        }
 			    } catch (SQLException ex) {
@@ -447,7 +523,6 @@ public class Busqueda extends JFrame {
 			        JOptionPane.showMessageDialog(null, "Error al obtener los datos de la reserva.");
 			    }
 			}
-
 		});	
 		
 		btnEditar.setLayout(null);
@@ -468,7 +543,7 @@ public class Busqueda extends JFrame {
 
 		btnEliminar.addMouseListener(new MouseAdapter() {
 		    public void mouseClicked(MouseEvent e) {
-		        int filaSeleccionada = (pestañaActual == 0) ? tbReservas.getSelectedRow() : tbHuespedes.getSelectedRow();
+		        int filaSeleccionada = (indicePestaña == 0) ? tbReservas.getSelectedRow() : tbHuespedes.getSelectedRow();
 
 		        if (filaSeleccionada == -1) {
 		            // Asegúrate de que se haya seleccionado una fila
@@ -479,14 +554,13 @@ public class Busqueda extends JFrame {
 		        int confirmacion = JOptionPane.showConfirmDialog(null, "¿Estás seguro de que quieres eliminar este registro?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
 
 		        if (confirmacion == JOptionPane.YES_OPTION) {
-		            if (pestañaActual == 0) {
+		            if (indicePestaña == 0) {
 		                borrarReserva(filaSeleccionada);
 		            } else {
 		                borrarHuesped(filaSeleccionada);
 		            }
 		        }
 		    }
-
 		    // Función para borrar una reserva y su huésped asociado
 		    private void borrarReserva(int filaSeleccionada) {
 		        String numeroReserva = tbReservas.getValueAt(filaSeleccionada, 0).toString();
@@ -519,9 +593,7 @@ public class Busqueda extends JFrame {
 		    // Función para borrar un huésped y su reserva asociada
 		    private void borrarHuesped(int filaSeleccionada) {
 		        String numeroHuesped = tbHuespedes.getValueAt(filaSeleccionada, 0).toString();
-		        
-		        System.out.println(numeroHuesped);
-		        
+		        		        
 		        // Realizar la eliminación en la base de datos
 		        try (Connection conexion = ConexionMySql.obtenerConexion();
 		        		

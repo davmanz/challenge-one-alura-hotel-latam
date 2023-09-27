@@ -2,7 +2,7 @@ package views;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-
+import views.RegistroHuesped;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
@@ -11,21 +11,28 @@ import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.util.Date;
 import java.awt.event.ActionEvent;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 
+
+
 @SuppressWarnings("serial")
 public class Exito extends JDialog {
-
+	
+	private static RegistroHuesped hr;
+	
 	private final JPanel contentPanel = new JPanel();
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
+	public static void main(RegistroHuesped[] args) {
 		try {
-			Exito dialog = new Exito();
+			Exito dialog = new Exito(hr);
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -35,7 +42,8 @@ public class Exito extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public Exito() {
+	public Exito(RegistroHuesped hr) {
+		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(Exito.class.getResource("/imagenes/aH-40px.png")));
 		setBounds(100, 100, 394, 226);
 		getContentPane().setLayout(new BorderLayout());
@@ -65,9 +73,12 @@ public class Exito extends JDialog {
 				JButton okButton = new JButton("OK");
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						dispose();//sirve para cerrar la ventana actual
 						MenuUsuario usuario = new MenuUsuario(); 
 						usuario.setVisible(true);
+						dispose();
+						hr.dispose();
+						
+					
 					}
 				});
 				okButton.setActionCommand("OK");

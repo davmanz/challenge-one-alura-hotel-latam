@@ -219,7 +219,7 @@ public class RegistroHuesped extends JFrame {
 		JLabel lblTitulo = new JLabel("REGISTRO HUESPED");
 		lblTitulo.setBounds(606, 55, 234, 42);
 		lblTitulo.setForeground(new Color(12, 138, 199));
-		lblTitulo.setFont(new Font("Roboto Black", Font.PLAIN, 23));
+		lblTitulo.setFont(new Font("Dialog", Font.PLAIN, 22));
 		contentPane.add(lblTitulo);
 		
 		JLabel lblNumeroReserva = new JLabel("NÚMERO DE RESERVA");
@@ -366,10 +366,11 @@ public class RegistroHuesped extends JFrame {
 			                txtNacionalidad.setEnabled(false);
 			                txtTelefono.setEditable(false);
 			                
-			                Exito exito = new Exito();
-			                		exito.setVisible(true);
+			                Exito exito = new Exito(RegistroHuesped.this);
+			                exito.setVisible(true);
+			                		
 			            } else {
-			            	Fallido fallido = new Fallido();
+			            	Fallido fallido = new Fallido(RegistroHuesped.this);
 	                		fallido.setVisible(true);
 			            }
 			        } catch (SQLException ex) {

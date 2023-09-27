@@ -123,7 +123,7 @@ public class ReservasView extends JFrame {
 		JLabel lblTitulo = new JLabel("SISTEMA DE RESERVAS");
 		lblTitulo.setBounds(109, 60, 219, 42);
 		lblTitulo.setForeground(new Color(12, 138, 199));
-		lblTitulo.setFont(new Font("Roboto", Font.BOLD, 20));
+		lblTitulo.setFont(new Font("Dialog", Font.BOLD, 18));
 		panel.add(lblTitulo);
 		
 		JPanel panel_1 = new JPanel();

@@ -36,7 +36,6 @@ public class RegistroHuesped extends JFrame {
     private static Date fechaSalida;
     private static float valorReserva;
     private static String formaPago;
-
 	private JPanel contentPane;
 	private JTextField txtNombre;
 	private JTextField txtApellido;
@@ -105,7 +104,6 @@ public class RegistroHuesped extends JFrame {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				headerMouseDragged(e);
-			     
 			}
 		});
 		header.addMouseListener(new MouseAdapter() {
@@ -150,7 +148,6 @@ public class RegistroHuesped extends JFrame {
 		labelAtras.setFont(new Font("Roboto", Font.PLAIN, 23));
 		labelAtras.setBounds(0, 0, 53, 36);
 		btnAtras.add(labelAtras);
-		
 		
 		txtNombre = new JTextField();
 		txtNombre.setFont(new Font("Roboto", Font.PLAIN, 16));
@@ -233,6 +230,7 @@ public class RegistroHuesped extends JFrame {
 		contentPane.add(lblNumeroReserva);
 		
 		txtNreserva = new JTextField();
+		txtNreserva.setEditable(false);
 		txtNreserva.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtNreserva.setBounds(560, 495, 285, 33);
 		txtNreserva.setColumns(10);
@@ -299,7 +297,6 @@ public class RegistroHuesped extends JFrame {
 			                JOptionPane.WARNING_MESSAGE);
 			    } else {
 			        try {
-			            
 			            // Establece la conexión
 			            Connection conexion = ConexionMySql.obtenerConexion();
 
@@ -363,11 +360,16 @@ public class RegistroHuesped extends JFrame {
 			            conexion.close();
 
 			            if (filasAfectadasHuespedes > 0 && filasAfectadasReserva > 0) {
+			            	
 			                txtNreserva.setText(idReserva);
-			                JOptionPane.showMessageDialog(null,
-			                        "Datos guardados exitosamente.",
-			                        "Guardado Exitoso",
-			                        JOptionPane.INFORMATION_MESSAGE);
+			                txtNombre.setEditable(false);
+			                txtApellido.setEditable(false);
+			                txtFechaN.setEnabled(false);
+			                txtNacionalidad.setEnabled(false);
+			                txtTelefono.setEditable(false);
+			                
+			                Exito exito = new Exito();
+			                		exito.setVisible(true);
 			            } else {
 			                JOptionPane.showMessageDialog(null,
 			                        "Error al guardar los datos.",

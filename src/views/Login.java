@@ -14,6 +14,9 @@ import java.awt.SystemColor;
 import java.awt.Font;
 import javax.swing.JPasswordField;
 import javax.swing.SwingConstants;
+
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -65,7 +68,6 @@ public class Login extends JFrame {
 		contentPane.setLayout(null);
 		setLocationRelativeTo(null);
 		
-		
 		JPanel panel = new JPanel();
 		panel.setBounds(0, 0, 788, 527);
 		panel.setBackground(Color.WHITE);
@@ -83,50 +85,54 @@ public class Login extends JFrame {
 		panel_1.add(imgHotel);
 		imgHotel.setIcon(new ImageIcon(Login.class.getResource("/imagenes/img-hotel-login-.png")));
 		
-		JPanel btnexit = new JPanel();
-		btnexit.setBounds(251, 0, 53, 36);
-		panel_1.add(btnexit);
-		btnexit.addMouseListener(new MouseAdapter() {
+		JPanel btnExit = new JPanel();
+		btnExit.setBounds(251, 0, 53, 36);
+		panel_1.add(btnExit);
+		btnExit.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				System.exit(0);
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
-				btnexit.setBackground(Color.red);
+				btnExit.setBackground(Color.red);
 				labelExit.setForeground(Color.white);
 			}			
 			@Override
 			public void mouseExited(MouseEvent e) {
-				 btnexit.setBackground(new Color(12, 138, 199));
+				 btnExit.setBackground(new Color(12, 138, 199));
 			     labelExit.setForeground(Color.white);
 			}
 		});
-		btnexit.setBackground(new Color(12, 138, 199));
-		btnexit.setLayout(null);
-		btnexit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		btnExit.setBackground(new Color(12, 138, 199));
+		btnExit.setLayout(null);
+		btnExit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 		
 		labelExit = new JLabel("X");
 		labelExit.setBounds(0, 0, 53, 36);
-		btnexit.add(labelExit);
+		btnExit.add(labelExit);
 		labelExit.setForeground(SystemColor.text);
 		labelExit.setFont(new Font("Roboto", Font.PLAIN, 18));
 		labelExit.setHorizontalAlignment(SwingConstants.CENTER);		
 		
 		txtUsuario = new JTextField();
-		txtUsuario.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				 if (txtUsuario.getText().equals("Ingrese su nombre de usuario")) {
-					 txtUsuario.setText("");
-					 txtUsuario.setForeground(Color.black);
-			        }
-			        if (String.valueOf(txtContrasena.getPassword()).isEmpty()) {
-			        	txtContrasena.setText("********");
-			        	txtContrasena.setForeground(Color.gray);
-			        }
-			}
+		txtUsuario.addFocusListener(new FocusAdapter() {
+		    @Override
+		    public void focusGained(FocusEvent e) {
+		        if (txtUsuario.getText().equals("Ingrese su nombre de usuario")) {
+		            txtUsuario.setText("");
+		            txtUsuario.setForeground(Color.black);
+		        }
+		    }
+		    @Override
+		    public void focusLost(FocusEvent e) {
+		        if (txtUsuario.getText().isEmpty()) {
+		            txtUsuario.setText("Ingrese su nombre de usuario");
+		            txtUsuario.setForeground(SystemColor.activeCaptionBorder);
+		        }
+		    }
 		});
+		
 		txtUsuario.setFont(new Font("Roboto", Font.PLAIN, 16));
 		txtUsuario.setText("Ingrese su nombre de usuario");
 		txtUsuario.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -153,18 +159,23 @@ public class Login extends JFrame {
 		
 		txtContrasena = new JPasswordField();
 		txtContrasena.setText("********");
-		txtContrasena.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent e) {
-				if (String.valueOf(txtContrasena.getPassword()).equals("********")) {
-					txtContrasena.setText("");
-					txtContrasena.setForeground(Color.black);
+		txtContrasena.addFocusListener(new FocusAdapter() {
+		    @Override
+		    public void focusGained(FocusEvent e) {
+		        char[] password = txtContrasena.getPassword();
+		        if (password.length == 0 || new String(password).equals("********")) {
+		            txtContrasena.setText("");
+		            txtContrasena.setForeground(Color.black);
 		        }
-		        if (txtUsuario.getText().isEmpty()) {
-		        	txtUsuario.setText("Ingrese su nombre de usuario");
-		        	txtUsuario.setForeground(Color.gray);
+		    }
+		    @Override
+		    public void focusLost(FocusEvent e) {
+		        char[] password = txtContrasena.getPassword();
+		        if (password.length == 0) {
+		            txtContrasena.setText("********");
+		            txtContrasena.setForeground(Color.gray);
 		        }
-			}
+		    }
 		});
 		txtContrasena.setForeground(SystemColor.activeCaptionBorder);
 		txtContrasena.setFont(new Font("Roboto", Font.PLAIN, 16));
@@ -190,7 +201,6 @@ public class Login extends JFrame {
 			public void mouseEntered(MouseEvent e) {
 				btnLogin.setBackground(new Color(0, 156, 223));
 			}
-		
 			@Override
 			public void mouseExited(MouseEvent e) {
 				btnLogin.setBackground(SystemColor.textHighlight);
@@ -223,8 +233,7 @@ public class Login extends JFrame {
 		header.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
-				headerMouseDragged(e);
-			     
+				headerMouseDragged(e); 
 			}
 		});
 		header.addMouseListener(new MouseAdapter() {
@@ -256,16 +265,12 @@ public class Login extends JFrame {
 	    }
 	}
 
-	private boolean verificarCredenciales(String usuario, String contrasena) {
-	    // URL de conexión a la base de datos MySQL
-	    String url = "jdbc:mysql://localhost:3306/bd_hotel";
-	    String usuarioBD = "root";
-	    String contrasenaBD = "";
+	private boolean verificarCredenciales(String usuario, String contrasena) {  
 
 	    try {
-	        // Establecer la conexión con la base de datos
-	        Connection conexion = DriverManager.getConnection(url, usuarioBD, contrasenaBD);
-
+	    	// Establecer la conexión con la base de datos
+	        Connection conexion = ConexionMySql.obtenerConexion();
+	        
 	        // Consulta SQL para verificar las credenciales
 	        String consultaSQL = "SELECT * FROM usuarios WHERE usuario = ? AND contraseña = ?";
 	        PreparedStatement statement = conexion.prepareStatement(consultaSQL);
@@ -290,7 +295,6 @@ public class Login extends JFrame {
 	}
 	/***********************************************************************************/
 	
-	
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
 	        xMouse = evt.getX();
 	        yMouse = evt.getY();
@@ -299,6 +303,5 @@ public class Login extends JFrame {
 	    private void headerMouseDragged(java.awt.event.MouseEvent evt) {
 	        int x = evt.getXOnScreen();
 	        int y = evt.getYOnScreen();
-	        this.setLocation(x - xMouse, y - yMouse);
-}
+	        this.setLocation(x - xMouse, y - yMouse);}
 }

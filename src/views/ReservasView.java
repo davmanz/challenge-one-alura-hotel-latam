@@ -305,8 +305,8 @@ public class ReservasView extends JFrame {
 				"Dinero en efectivo"}));
 		panel.add(txtFormaPago);
 
-		JPanel btnsiguiente = new JPanel();
-		btnsiguiente.addMouseListener(new MouseAdapter() {
+		JPanel btnSiguiente = new JPanel();
+		btnSiguiente.addMouseListener(new MouseAdapter() {
 		    @Override
 		    public void mouseClicked(MouseEvent e) {
 		        if (ReservasView.txtFechaEntrada.getDate() != null && ReservasView.txtFechaSalida.getDate() != null){
@@ -319,19 +319,20 @@ public class ReservasView extends JFrame {
 		            // Crear una instancia de RegistroHuesped y pasar los valores
 		            RegistroHuesped registro = new RegistroHuesped(fechaEntrada, fechaSalida, valorReserva, formaPago);
 		            registro.setVisible(true);
+			        dispose();
 		        } else {
 		            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos.");
 		        }
 		    }
 		});
 		
-		btnsiguiente.setLayout(null);
-		btnsiguiente.setBackground(SystemColor.textHighlight);
-		btnsiguiente.setBounds(238, 493, 122, 35);
-		panel.add(btnsiguiente);
-		btnsiguiente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-		btnsiguiente.add(lblSiguiente); // Add the label to the button
-		panel.add(btnsiguiente); // Add the button to the panel
+		btnSiguiente.setLayout(null);
+		btnSiguiente.setBackground(SystemColor.textHighlight);
+		btnSiguiente.setBounds(238, 493, 122, 35);
+		panel.add(btnSiguiente);
+		btnSiguiente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+		btnSiguiente.add(lblSiguiente); // Add the label to the button
+		panel.add(btnSiguiente); // Add the button to the panel
 	}
 		
 	//Código que permite mover la ventana por la pantalla según la posición de "x" y "y"	

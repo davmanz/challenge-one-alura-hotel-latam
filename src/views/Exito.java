@@ -20,7 +20,6 @@ import java.awt.Toolkit;
 public class Exito extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
-
 	/**
 	 * Launch the application.
 	 */
@@ -33,7 +32,6 @@ public class Exito extends JDialog {
 			e.printStackTrace();
 		}
 	}
-
 	/**
 	 * Create the dialog.
 	 */

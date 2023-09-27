@@ -62,7 +62,6 @@ public class RegistroHuesped extends JFrame {
 			}
 		});
 	}
-
 	/**
 	 * Create the frame.
 	 */
@@ -313,8 +312,7 @@ public class RegistroHuesped extends JFrame {
 			            // Si el último ID es 0 (no hay registros), establece nuevoID en 1; de lo contrario, suma 1 al último ID
 			            int nuevoID = (ultimoID == 0) ? 1 : ultimoID + 1;
 
-			            // Genera el número de reserva con el formato "ALR-fecha actual-número generado"
-			            
+			            // Genera el número de reserva con el formato "ALR-fecha actual-número generado
 			            String idReserva = "ALR-" + nuevoID;
 
 			            // Define la consulta SQL para insertar los datos en la tabla huéspedes
@@ -371,10 +369,8 @@ public class RegistroHuesped extends JFrame {
 			                Exito exito = new Exito();
 			                		exito.setVisible(true);
 			            } else {
-			                JOptionPane.showMessageDialog(null,
-			                        "Error al guardar los datos.",
-			                        "Error",
-			                        JOptionPane.ERROR_MESSAGE);
+			            	Fallido fallido = new Fallido();
+	                		fallido.setVisible(true);
 			            }
 			        } catch (SQLException ex) {
 			            ex.printStackTrace();

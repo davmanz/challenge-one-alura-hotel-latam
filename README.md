@@ -65,12 +65,15 @@ Crea una solicitud de extracción hacia el repositorio principal.
 ## Creacion de la Base de Datos en MySql
 
 -- Crear la base de datos bd_hotel
+
 CREATE DATABASE db_hotel;
 
 -- Usar la base de datos bd_hotel
+
 USE db_hotel;
 
 -- Crear la tabla 'huespedes'
+
 CREATE TABLE huespedes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     Nombre VARCHAR(255) COLLATE utf8mb4_general_ci,
